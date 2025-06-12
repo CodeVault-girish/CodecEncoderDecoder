@@ -1,0 +1,65 @@
+import os
+import torch
+import torchaudio
+from transformers import EncodecModel, AutoProcessor
+
+class Encodec24Decoder:
+    def __init__(self, hub_name: str, sample_rate: int, device: str = "cpu"):
+        self.device      = torch.device(device)
+        print(f"  → Loading Encodec model {hub_name} onto {self.device}")
+        self.model       = EncodecModel.from_pretrained(hub_name).eval().to(self.device)
+        self.processor   = AutoProcessor.from_pretrained(hub_name)
+        self.sample_rate = self.processor.sampling_rate
+        self.name        = hub_name.replace("/", "_")
+
+    def decode_file(self, src_path: str, out_dir: str):
+        base     = os.path.splitext(os.path.basename(src_path))[0]
+        out_name = f"{base}_{self.name}.wav"
+        out_path = os.path.join(out_dir, out_name)
+        os.makedirs(out_dir, exist_ok=True)
+
+        # 1) load + mono + resample
+        wav, sr = torchaudio.load(src_path)                       # (channels, T)
+        if wav.size(0) > 1:
+            wav = wav.mean(dim=0, keepdim=True)                   # (1, T)
+        if sr != self.sample_rate:
+            wav = torchaudio.transforms.Resample(
+                orig_freq=sr, new_freq=self.sample_rate
+            )(wav)
+
+        # 2) prepare inputs
+        audio_np   = wav.squeeze(0).cpu().numpy()                 # (T,)
+        inputs     = self.processor(
+                        raw_audio=audio_np,
+                        sampling_rate=self.sample_rate,
+                        return_tensors="pt"
+                     )
+        input_vals = inputs["input_values"].to(self.device)
+        padding    = inputs.get("padding_mask", None)
+        if padding is not None:
+            padding = padding.to(self.device)
+
+        # 3) encode + decode
+        with torch.inference_mode():
+            enc     = self.model.encode(input_vals, padding_mask=padding)
+            codes   = enc.audio_codes
+            scales  = enc.audio_scales
+            decoded = self.model.decode(codes, scales, padding_mask=padding)[0]
+
+        # 4) squeeze to 2D (channels, samples)
+        # possible shapes: (1, T), (1, 1, T), (C, T), (B, C, T)
+        if decoded.ndim == 3:
+            # (1, C, T) or (B, C, T)
+            decoded = decoded.squeeze(0)       # → (C, T)
+        elif decoded.ndim == 1:
+            decoded = decoded.unsqueeze(0)     # → (1, T)
+
+        # ensure tensor is on CPU & float32
+        decoded = decoded.to(torch.float32).cpu()
+
+        # 5) save
+        torchaudio.save(out_path, decoded, self.sample_rate)
+
+        # 6) cleanup
+        del wav, inputs, input_vals, padding, enc, codes, scales, decoded
+        return out_name

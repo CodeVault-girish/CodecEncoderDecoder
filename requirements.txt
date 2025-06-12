@@ -1,0 +1,7 @@
+torch
+torchaudio
+soundfile
+snac
+tqdm
+beartype
+# pip install -U encodec
