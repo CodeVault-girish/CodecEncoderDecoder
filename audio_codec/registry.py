@@ -72,12 +72,9 @@ CODEC_REGISTRY = {
         "name":        "speechtokenizer",
         "module":      "audio_codec.codecs.speechtokenizer",
         "class":       "SpeechTokenizerDecoder",
-        # default paths – update these to your actual files:
-        "config":      "/path/to/speechtokenizer/config.yaml",
-        "checkpoint":  "/path/to/speechtokenizer/checkpoint.ckpt",
-        # sample_rate will be read from the loaded model
+        "config_path": "config/config.json",
+        "ckpt_path":   "checkpoints/SpeechTokenizer.pt",
         "sample_rate": None,
     },
-
 
 }

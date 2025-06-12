@@ -13,5 +13,19 @@ decoder_list()
 # decode folder
 ```
 decode_folder('2', 'raw_wavs', 'decoded', 'cpu')
-decode_folder('9', '/home/girish/Girish/Reseach/Health-care/Audio_Data/Audio_Data/HC', 'output/', 'cuda')
+decode_folder('10', '/home/girish/Girish/Reseach/Health-care/Audio_Data/Audio_Data/HC', 'output/', 'cuda')
 ```
+
+
+# For fnlp/SpeechTokenizer use this link to get it's model 
+
+[fnlp/SpeechTokenizer model](https://huggingface.co/fnlp/SpeechTokenizer/tree/main/speechtokenizer_hubert_avg)
+
+Add this model in this 
+<repo-root>/
+  audio_codec/
+    codecs/
+  config/
+    config.json
+  checkpoints/
+    SpeechTokenizer.pt

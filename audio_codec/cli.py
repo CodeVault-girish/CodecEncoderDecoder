@@ -22,8 +22,12 @@ def gen_wav_paths(in_dir):
 
 def decode_folder(decoder_id, in_dir, out_dir, device_str):
     """
-    Load the model once, decode every .wav under in_dir → out_dir,
-    show a single tqdm bar, and clean up after each file.
+    Dynamically builds the decoder with any of:
+      - hub_name
+      - sample_rate
+      - device
+      - config & checkpoint (for SpeechTokenizer)
+    then decodes all .wav under in_dir → out_dir with a tqdm bar.
     """
     if decoder_id not in CODEC_REGISTRY:
         print(f"Unknown decoder {decoder_id!r}. Run `list` to see valid IDs.")
@@ -40,18 +44,23 @@ def decode_folder(decoder_id, in_dir, out_dir, device_str):
         print("Warning: CUDA unavailable; falling back to CPU.")
     device = "cuda" if (device_str == "cuda" and can_cuda) else "cpu"
 
-    # Load model
-    print(f"\nLoading model {info['name']} onto {device}…")
-    decoder = Decoder(
-        hub_name    = info["hub_name"],
-        sample_rate = info["sample_rate"],
-        device      = device
-    )
+    # Build constructor kwargs dynamically
+    ctor_kwargs = {"device": device}
+    if "hub_name" in info:
+        ctor_kwargs["hub_name"]    = info["hub_name"]
+    if info.get("sample_rate") is not None:
+        ctor_kwargs["sample_rate"] = info["sample_rate"]
+    if "config" in info and "checkpoint" in info:
+        ctor_kwargs["config_path"] = info["config"]
+        ctor_kwargs["ckpt_path"]   = info["checkpoint"]
+
+    print(f"\nLoading model {info['name']} with {ctor_kwargs}…")
+    decoder = Decoder(**ctor_kwargs)
 
     try:
         os.makedirs(out_dir, exist_ok=True)
 
-        # Count files
+        # Count files (O(1) memory)
         total = sum(1 for _ in gen_wav_paths(in_dir))
         if total == 0:
             print("No WAV files found.")
@@ -59,7 +68,7 @@ def decode_folder(decoder_id, in_dir, out_dir, device_str):
 
         print(f"\nDecoding {total} files with {info['name']} on {device}:\n")
 
-        # Decode with progress bar
+        # Single-pass tqdm
         pbar = tqdm(total=total, unit="it", desc="Decoding", ncols=80)
         for src in gen_wav_paths(in_dir):
             start = time.perf_counter()
@@ -88,7 +97,6 @@ def main():
     sub    = parser.add_subparsers(dest="cmd", required=True)
 
     sub.add_parser("list", help="Show available decoders")
-
     dec = sub.add_parser("decode", help="Decode a folder of WAVs")
     dec.add_argument("decoder_id", help="ID of decoder (see list)")
     dec.add_argument("in_dir",     help="Input folder path")
