@@ -1,8 +1,19 @@
 # NeuralCodecDecoder
 ***
 ***
-
-
+# To use these codec
+## Available decoders:
+```
+  1. snac_24khz
+  2. snac_32khz
+  3. snac_44khz
+  4. dac_16khz
+  5. dac_24khz
+  6. dac_44khz
+  7. encodec_24khz
+  8. encodec_48khz
+  9. soundstream_16khz
+  10. speechtokenizer
 ```
 from audio_codec.registry import CODEC_REGISTRY
 from audio_codec.cli import decoder_list, decode_folder
@@ -13,7 +24,21 @@ from audio_codec.cli import decoder_list, decode_folder
 decoder_list()
 ```
 
-# decode folder
+# To decode use codec model no like
+```
+snac_24khz=1
+snac_32khz=2
+snac_44khz=3
+dac_16khz=4
+dac_24khz=5
+dac_44khz=6
+encodec_24khz=7
+encodec_48khz=8
+soundstream_16khz=9
+speechtokenizer=10
+```
+---
+---
 ```
 decode_folder('2', 'raw_wavs', 'decoded', 'cpu')
 decode_folder('10', '/home/girish/Girish/Reseach/Health-care/Audio_Data/Audio_Data/HC', 'output/', 'cuda')
