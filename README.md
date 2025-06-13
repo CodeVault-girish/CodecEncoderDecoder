@@ -1,8 +1,11 @@
 # NeuralCodecDecoder
+
 ***
 ***
+
 # To use these codec
 ## Available decoders:
+
 ```
   1. snac_24khz
   2. snac_32khz
@@ -16,16 +19,24 @@
   10. speechtokenizer
 ```
 ```
+git clone https://github.com/CodeVault-girish/NeuralCodecDecoder.git
+cd NeuralCodecDecoder
+```
+## Recomend create seprate env for each codec model
+```
 from audio_codec.registry import CODEC_REGISTRY
 from audio_codec.cli import decoder_list, decode_folder
 ```
 
 # list available
+
 ```
 decoder_list()
 ```
 
+---
 # To decode use codec model no like
+
 ```
 snac_24khz=1
 snac_32khz=2
@@ -38,14 +49,12 @@ encodec_48khz=8
 soundstream_16khz=9
 speechtokenizer=10
 ```
----
----
 ```
 decode_folder('2', 'raw_wavs', 'decoded', 'cpu')
 decode_folder('10', '/home/girish/Girish/Reseach/Health-care/Audio_Data/Audio_Data/HC', 'output/', 'cuda')
 ```
-
-
+---
+---
 # For SpeechTokenizer 
 ## use this link to get it's model 
 
@@ -65,7 +74,6 @@ NeuralCodecDecoder/
 
 Place the downloaded `SpeechTokenizer.pt` file into the `checkpoints/` directory as shown above.
 
-
 ```
 pip install --upgrade pip setuptools wheel
 pip install --only-binary=:all: tokenizers
@@ -76,9 +84,8 @@ additional
 ```
 pip install --no-deps --force-reinstall git+https://github.com/ga642381/AudioCodec-Hub.git soundfile
 ```
-
-
-
+---
+---
 ## For Funcodec
 ```
 pyhton3 -m venv funcodec
