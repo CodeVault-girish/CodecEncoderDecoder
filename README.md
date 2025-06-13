@@ -15,6 +15,7 @@
   9. soundstream_16khz
   10. speechtokenizer
 ```
+```
 from audio_codec.registry import CODEC_REGISTRY
 from audio_codec.cli import decoder_list, decode_folder
 ```
