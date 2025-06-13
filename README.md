@@ -34,3 +34,15 @@ NeuralCodecDecoder/
 ```
 
 Place the downloaded `SpeechTokenizer.pt` file into the `checkpoints/` directory as shown above.
+
+
+```
+pip install --upgrade pip setuptools wheel
+pip install --only-binary=:all: tokenizers
+
+pip install git+https://github.com/ga642381/AudioCodec-Hub.git soundfile
+```
+additional
+```
+pip install --no-deps --force-reinstall git+https://github.com/ga642381/AudioCodec-Hub.git soundfile
+```

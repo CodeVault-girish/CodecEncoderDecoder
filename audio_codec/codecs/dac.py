@@ -1,65 +1,55 @@
+# audio_codec/codecs/dac.py
+
 import os
 import torch
-import torchaudio
-import torch.nn.functional as F
-from transformers import DacModel, AutoProcessor
+import dac
+from audiotools import AudioSignal
 
 class DACDecoder:
     def __init__(self, hub_name: str, sample_rate: int, device: str = "cpu"):
-        self.device = torch.device(device)
-        print(f"  → Loading DAC model {hub_name} onto {self.device}")
-        # exactly as in your snippet:
-        self.model     = DacModel.from_pretrained(hub_name).eval().to(self.device)
-        self.processor = AutoProcessor.from_pretrained(hub_name)
-        # use the processor’s sampling_rate (should match hub_name)
-        self.sample_rate = self.processor.sampling_rate
-        self.name        = hub_name.replace("/", "_")
+        """
+        hub_name: will be something like "dac_16khz" or "dac_24khz" (matches registry name)
+        sample_rate: unused here (dac knows its own rate), but kept for API consistency
+        device: "cpu" or "cuda"
+        """
+        # pick device
+        self.device = torch.device(device if (device == "cpu" or torch.cuda.is_available()) else "cpu")
+        # derive model_type from hub_name
+        # e.g. hub_name="descript/dac_16khz" or simply "dac_16khz"
+        model_type = hub_name.split("/")[-1].replace("dac_", "")
+        print(f"  → Downloading + loading DAC model (→ {model_type}) onto {self.device}")
+        # download returns a local path to the weights
+        model_path = dac.utils.download(model_type=model_type)
+        # load the DAC object
+        self.model = dac.DAC.load(model_path).to(self.device).eval()
+        # name for output files
+        self.name = f"dac_{model_type}"
 
-    def decode_file(self, src_path: str, out_dir: str):
+    def decode_file(self, src_path: str, out_dir: str) -> str:
         """
-        Encode + decode one WAV via DAC, saving to:
-          out_dir/<basename>_<hub_name>.wav
+        Round-trip one WAV through DAC, writing:
+            out_dir/<basename>_dac_<rate>.wav
+        Uses model.compress + model.decompress under the hood (with chunking).
         """
-        base = os.path.splitext(os.path.basename(src_path))[0]
+        base     = os.path.splitext(os.path.basename(src_path))[0]
         out_name = f"{base}_{self.name}.wav"
         out_path = os.path.join(out_dir, out_name)
         os.makedirs(out_dir, exist_ok=True)
 
-        # --- your snippet begins here ---
-        wav_path = src_path
-        audio_sample, sr = torchaudio.load(wav_path)
+        # 1) Load as an AudioSignal (handles sampling + mono/stereo)
+        signal = AudioSignal(src_path)
+        signal = signal.to(self.model.device)
 
-        if sr != self.processor.sampling_rate:
-            resampler = torchaudio.transforms.Resample(
-                orig_freq=sr, new_freq=self.processor.sampling_rate
-            )
-            audio_sample = resampler(audio_sample)
+        # 2) Compress → a DACFile (handles chunking for long files)
+        compressed = self.model.compress(signal)
 
-        inputs = self.processor(
-            raw_audio=audio_sample.squeeze().numpy(),
-            sampling_rate=self.processor.sampling_rate,
-            return_tensors="pt"
-        )
+        # 3) Decompress → back to an AudioSignal
+        recon = self.model.decompress(compressed)
 
-        encoder_outputs = self.model.encode(inputs["input_values"])
-        audio_codes = encoder_outputs.audio_codes
-        print(f"Original shape of audio codes: {audio_codes.shape}")
+        # 4) Move back to CPU and write WAV
+        recon = recon.to("cpu")
+        recon.write(out_path)
 
-        audio_codes = F.interpolate(
-            audio_codes.permute(0, 2, 1),
-            size=1024,
-            mode="linear"
-        ).permute(0, 2, 1)
-        print(f"Interpolated shape of audio codes: {audio_codes.shape}")
-
-        audio_codes = audio_codes.float()
-        decoded_audio = self.model.decode(audio_codes)[0]
-
-        if decoded_audio.ndim == 1:  # If it's 1D, assume mono and add a channel
-            decoded_audio = decoded_audio.unsqueeze(0)
-        decoded_audio = decoded_audio.to(torch.float32)
-
-        torchaudio.save(out_path, decoded_audio.cpu(), self.processor.sampling_rate)
-        # --- snippet ends ---
-
+        # 5) Cleanup
+        del signal, compressed, recon
         return out_name
