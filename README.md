@@ -17,7 +17,8 @@ decode_folder('10', '/home/girish/Girish/Reseach/Health-care/Audio_Data/Audio_Da
 ```
 
 
-# For fnlp/SpeechTokenizer use this link to get it's model 
+## For SpeechTokenizer 
+# use this link to get it's model 
 
 [fnlp/SpeechTokenizer model](https://huggingface.co/fnlp/SpeechTokenizer/tree/main/speechtokenizer_hubert_avg)
 
@@ -49,7 +50,7 @@ pip install --no-deps --force-reinstall git+https://github.com/ga642381/AudioCod
 
 
 
-## For Funcoded
+## For Funcodec
 ```
 pyhton3 -m venv funcodec
 source funcodec/bin/activate
