@@ -6,16 +6,16 @@
 # To use these codec
 ## Available decoders:
 
-##  1. snac_24khz
-##  2. snac_32khz
-##  3. snac_44khz
-##  4. dac_16khz
-##  5. dac_24khz
-##  6. dac_44khz
-##  7. encodec_24khz
-##  8. encodec_48khz
-##  9. soundstream_16khz
-##  10. speechtokenizer
+  1. snac_24khz
+  2. snac_32khz
+  3. snac_44khz
+  4. dac_16khz
+  5. dac_24khz
+  6. dac_44khz
+  7. encodec_24khz
+  8. encodec_48khz
+  9. soundstream_16khz
+  10. speechtokenizer
 ```
 git clone https://github.com/CodeVault-girish/NeuralCodecDecoder.git
 cd NeuralCodecDecoder
