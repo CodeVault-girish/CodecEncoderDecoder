@@ -20,7 +20,9 @@ decoder_list()
 
 ---
 # Supported Models codec
-## Available decoders:
+## Available decoders
+
+The following codec decoders are available in this repository:
 
 1. **snac_24khz**  
 2. **snac_32khz**  
@@ -32,6 +34,8 @@ decoder_list()
 8. **encodec_48khz**  
 9. **soundstream_16khz**  
 10. **speechtokenizer**
+--. **Funcodec**
+--. **AudioDec**
 ```
 decode_folder('2', 'raw_wavs', 'decoded', 'cpu')
 decode_folder('10', '/home/girish/Girish/Reseach/Health-care/Audio_Data/Audio_Data/HC', 'output/', 'cuda')
@@ -122,3 +126,15 @@ bash encoding_decoding.sh \
   --wav_scp outputs/codecs/codecs.txt \
   --out_dir outputs/recon_wavs
 ```
+
+---
+---
+# AudioDec
+
+## take AudioDec.py file from this repo and paste in 
+```
+git clone https://github.com/facebookresearch/AudioDec.git
+cd AudioDec
+pip install -r requirements.txt
+```
+## Download this [exp](https://github.com/facebookresearch/AudioDec/releases/download/pretrain_models_v02/exp.zip) and save in this
