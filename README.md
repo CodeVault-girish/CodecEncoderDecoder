@@ -144,21 +144,42 @@ python demoFile.py --model libritts_v1 -i ../codec/test/ -o output/
 python demoFile.py --model libritts_v1 -i ../codec/test/A002_02_BBP_NORMAL.wav -o output.wav
 
  -->
-1. Single-file mode
-. With GPU (e.g. CUDA device 0)
-```
-python demoFile.py --model libritts_v1 -i path/to/input.wav -o path/to/output.wav
-```
-.With CPU only 
-```
-python demoFile.py --cuda -1 --model vctk_v1 -i path/to/input.wav -o path/to/output.wav
-```
-2. Folder mode
-.With GPU
-```
-python demoFile.py --model vctk_v1 -i path/to/input_folder -o path/to/output_folder
-```
-.With CPU only
-```
-python demoFile.py --cuda -1 --model libritts_v1 -i path/to/input_folder -o path/to/output_folder
-```
+## Usage
+
+### 1. Single-file mode
+
+- **With GPU** (e.g., CUDA device 0)  
+  \`\`\`bash
+  python demoFile.py \\
+    --model libritts_v1 \\
+    -i path/to/input.wav \\
+    -o path/to/output.wav
+  \`\`\`
+
+- **With CPU only**  
+  \`\`\`bash
+  python demoFile.py \\
+    --cuda -1 \\
+    --model vctk_v1 \\
+    -i path/to/input.wav \\
+    -o path/to/output.wav
+  \`\`\`
+
+### 2. Folder mode
+
+- **With GPU**  
+  \`\`\`bash
+  python demoFile.py \\
+    --model vctk_v1 \\
+    -i path/to/input_folder \\
+    -o path/to/output_folder
+  \`\`\`
+
+- **With CPU only**  
+  \`\`\`bash
+  python demoFile.py \\
+    --cuda -1 \\
+    --model libritts_v1 \\
+    -i path/to/input_folder \\
+    -o path/to/output_folder
+  \`\`\`
