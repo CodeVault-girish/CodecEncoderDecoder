@@ -1,4 +1,7 @@
 # NeuralCodecDecoder
+***
+***
+
 
 ```
 from audio_codec.registry import CODEC_REGISTRY
