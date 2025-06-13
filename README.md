@@ -86,9 +86,8 @@ bash encoding_decoding.sh \
   --out_dir outputs/codecs
 ```
 # Decoding
-
+```
 model_name=audio_codec-encodec-zh_en-general-16k-nq32ds640-pytorch
-
 bash encoding_decoding.sh \
   --stage 2 \
   --batch_size 1 \
