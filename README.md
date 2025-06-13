@@ -90,7 +90,10 @@ model_name="audio_codec-encodec-en-libritts-16k-nq32ds640-pytorch"
 git lfs install
 git clone https://huggingface.co/alibaba-damo/${model_name}
 ```
-
+## folder path
+```
+find ../../../../../Girish/Reseach/Health-care/Audio_Data/Audio_Data/HC/  -name "*.wav" | awk -F/ '{printf "%s %s\n", $(NF-1) "_" $NF, $0}' > input.scp
+```
 # Encoding
 ```
 model_name=audio_codec-encodec-zh_en-general-16k-nq32ds640-pytorch
