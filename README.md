@@ -17,8 +17,8 @@ decode_folder('10', '/home/girish/Girish/Reseach/Health-care/Audio_Data/Audio_Da
 ```
 
 
-## For SpeechTokenizer 
-# use this link to get it's model 
+# For SpeechTokenizer 
+## use this link to get it's model 
 
 [fnlp/SpeechTokenizer model](https://huggingface.co/fnlp/SpeechTokenizer/tree/main/speechtokenizer_hubert_avg)
 
